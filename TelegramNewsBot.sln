@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramNewsBot", "TelegramNewsBot\TelegramNewsBot.csproj", "{480FD435-9ACA-4DE3-A9FF-018049408326}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{480FD435-9ACA-4DE3-A9FF-018049408326}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{480FD435-9ACA-4DE3-A9FF-018049408326}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{480FD435-9ACA-4DE3-A9FF-018049408326}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{480FD435-9ACA-4DE3-A9FF-018049408326}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
