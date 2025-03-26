@@ -17,7 +17,6 @@ public static class InfrastructureServices
         services.AddDbContext<NewsStatisticsContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
-                // Add EF Core Npgsql-specific options if needed
                 b => b.MigrationsAssembly(typeof(NewsStatisticsContext).Assembly.FullName)
             )
         );
@@ -29,6 +28,7 @@ public static class InfrastructureServices
         services.AddScoped<INewsService>(sp => 
             new NewsService(configuration["NewsAPI:Key"]));
         services.AddScoped<UserStatisticsService>();
+        services.AddScoped<UserSessionService>();
 
         return services;
     }

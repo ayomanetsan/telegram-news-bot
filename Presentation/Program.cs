@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Data.Enums;
 using Infrastructure;
 using Infrastructure.Data;
 using Infrastructure.Services;
@@ -73,33 +74,70 @@ internal abstract class Program
 
         using var scope = _serviceProvider.CreateScope();
         
+        // Resolve required services
         var messageService = scope.ServiceProvider.GetRequiredService<IMessageService>();
         var newsService = scope.ServiceProvider.GetRequiredService<INewsService>();
         var statsService = scope.ServiceProvider.GetRequiredService<UserStatisticsService>();
+        var sessionService = scope.ServiceProvider.GetRequiredService<UserSessionService>();
 
-        var chatId = update.Message.Chat.Id;
-        var messageText = update.Message.Text;
+        var message = update.Message;
+        var chatId = message.Chat.Id;
+        var messageText = message.Text;
 
-        Console.WriteLine($"Received a message: {messageText}");
+        // Get or create user session
+        var userSession = await sessionService.GetOrCreateSessionAsync(message.From.Id);
 
-        // Fetch news
-        var newsResult = await newsService.FetchNewsAsync(messageText);
+        // Determine next state based on user input
+        var nextState = sessionService.DetermineNextState(userSession, messageText);
+        userSession.CurrentState = nextState;
 
-        // Record user interaction
-        await statsService.RecordUserInteraction(update.Message, messageText);
+        // Handle different states
+        switch (nextState)
+        {
+            case BotState.Start:
+                await messageService.SendMessageAsync(
+                    chatId, 
+                    "Welcome! What would you like to do?",
+                    messageService.CreateAdvancedKeyboard(BotState.Start)
+                );
+                break;
 
-        // Send news with theme keyboard
-        await messageService.SendMessageAsync(
-            chatId, 
-            newsResult, 
-            messageService.CreateThemeKeyboard()
-        );
-        
-        await messageService.SendMessageAsync(
-            chatId, 
-            "Type in the theme to search for or select from the keyboard below:",
-            messageService.CreateThemeKeyboard()
-        );
+            case BotState.WaitingForTheme:
+                await messageService.SendMessageAsync(
+                    chatId, 
+                    "Please select a news theme or enter your own:",
+                    messageService.CreateAdvancedKeyboard(BotState.WaitingForTheme)
+                );
+                break;
+
+            case BotState.Settings:
+                await messageService.SendMessageAsync(
+                    chatId, 
+                    "Settings Menu:",
+                    messageService.CreateAdvancedKeyboard(BotState.Settings)
+                );
+                break;
+
+            // News theme selection
+            default:
+                // Update session
+                userSession.LastSelectedTheme = messageText;
+                await sessionService.UpdateSessionAsync(userSession);
+
+                // Fetch and send news
+                var newsResult = await newsService.FetchNewsAsync(messageText);
+                    
+                // Record user interaction
+                await statsService.RecordUserInteraction(message, messageText);
+
+                // Send news with theme keyboard and inline options
+                await messageService.SendMessageAsync(
+                    chatId, 
+                    newsResult, 
+                    messageService.CreateAdvancedKeyboard(BotState.ThemeSelected)
+                );
+                break;
+        }
     }
 
     private static Task HandleErrorAsync(

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Data.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types.Enums;
 
 namespace Application.Common.Interfaces;
@@ -25,4 +26,17 @@ public interface IMessageService
     /// </summary>
     /// <returns>ReplyKeyboardMarkup with predefined themes</returns>
     ReplyKeyboardMarkup CreateThemeKeyboard();
+
+    /// <summary>
+    /// Creates an advanced keyboard with multiple options
+    /// </summary>
+    /// <param name="state">Current bot state</param>
+    /// <returns>Customized keyboard markup</returns>
+    ReplyKeyboardMarkup CreateAdvancedKeyboard(BotState state);
+
+    /// <summary>
+    /// Creates an inline keyboard for additional interactions
+    /// </summary>
+    /// <returns>Inline keyboard markup</returns>
+    InlineKeyboardMarkup CreateInlineKeyboard();
 }

@@ -11,6 +11,7 @@ namespace Infrastructure
         {
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appSettings.json")
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<NewsStatisticsContext>();
